@@ -28,6 +28,7 @@ def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):
     # Send follow-up message to the room
     wa.send_follow_up_message(room_id)
 
+
 start_timer = perf_counter()
 
 # Fetch all matches at once

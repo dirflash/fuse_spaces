@@ -55,6 +55,7 @@ def add_ses_to_room(SE_emails, wa_room):
                 if wa_membership.status_code == 200:
                     print(f"    SE{x + 1} added to room.")
                     # print(wa_membership.json())
+                    break
             except Exception as e:
                 print(f"    *** SE{x + 1} ({email}) failed to add to room.")
                 print(f"    *** Sleeping for {pow(2, _)} seconds and trying again.")
@@ -101,6 +102,7 @@ def send_follow_up_message(wa_room):
                 )
                 print(f"     Message ID: {wa_follow_up_message.json()['id']}")
                 print("   Setup complete.")
+                break
         except Exception as e:
             print(
                 f"  *** Follow-up message failed ({wa_follow_up_message.status_code})"

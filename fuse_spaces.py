@@ -1,4 +1,11 @@
-from time import sleep
+# Description: This script creates Webex spaces for each pair of SEs for the Fuse date discussion
+# This script is a part of the Fuse project and is not intended for use outside of the project.
+# Author: Aaron Davis
+# Company: Cisco
+# Creation Date: 2024-02-04
+# Modified Date: 2024-02-04
+
+from time import perf_counter, sleep
 from typing import List
 
 from pymongo.errors import ConnectionFailure
@@ -21,6 +28,7 @@ def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):
     # Send follow-up message to the room
     wa.send_follow_up_message(room_id)
 
+start_timer = perf_counter()
 
 # Fetch all matches at once
 for _ in range(5):
@@ -116,3 +124,6 @@ else:
     SE_emails = [SE1_email, SE2_email]
     print(f" Pair email addresses: {SE_emails}")
     webex_activities(fuse_date, SE1_name, SE2_name, SE_emails)
+
+stop_timer = perf_counter()
+print(f"\nTotal time: {stop_timer - start_timer:.2f} seconds")

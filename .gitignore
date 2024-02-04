@@ -7,6 +7,3 @@ utils/preferences.py
 .venv
 .mypy_cache/
 .cache*
-
-async_spaces.py
-utils/async_webex_actions.py

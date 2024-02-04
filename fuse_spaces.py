@@ -1,4 +1,7 @@
+from time import sleep
 from typing import List
+
+from pymongo.errors import ConnectionFailure
 
 from utils import preferences as p
 from utils import webex_actions as wa
@@ -20,11 +23,21 @@ def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):
 
 
 # Fetch all matches at once
-all_matches = list(
-    p.cwa_matches.find(
-        {"assignments": {"$exists": True}}, {"_id": 0, "SE": 1, "assignments": 1}
-    )
-)
+for _ in range(5):
+    try:
+        all_matches = list(
+            p.cwa_matches.find(
+                {"assignments": {"$exists": True}},
+                {"_id": 0, "SE": 1, "assignments": 1},
+            )
+        )
+        break
+    except ConnectionFailure as e:
+        print(
+            f"*** Failed to fetch matches. Sleeping for {pow(2, _)} seconds and trying again."
+        )
+        sleep(pow(2, _))
+        print(e)
 
 # Filter matches in memory
 matches = [match for match in all_matches if fuse_date in match["assignments"]]
@@ -61,9 +74,18 @@ print(f" Number of pairs: {len(partner_pairs)}")
 all_se = {se for pair in partner_pairs for se in pair}
 
 # Query all SE values at once
-all_se_names = p.se_info.find(
-    {"se": {"$in": list(all_se)}}, {"_id": 0, "se": 1, "se_name": 1}
-)
+for _ in range(5):
+    try:
+        all_se_names = p.se_info.find(
+            {"se": {"$in": list(all_se)}}, {"_id": 0, "se": 1, "se_name": 1}
+        )
+        break
+    except ConnectionFailure as e:
+        print(
+            f"*** Failed to fetch SE names. Sleeping for {pow(2, _)} seconds and trying again."
+        )
+        sleep(pow(2, _))
+        print(e)
 
 # Map se to se_name for quick access
 se_name_dict = {doc["se"]: doc["se_name"] for doc in all_se_names}

@@ -1,3 +1,5 @@
+from time import sleep
+
 import requests
 
 from cards import space_card
@@ -20,16 +22,22 @@ def make_space(fuse_date, SE1_name, SE2_name):
         "isLocked": False,
         "description": f"Fuse Session - Intro space for {SE1_name} and {SE2_name}",
     }
-    # Create a Webex App room for each pair
-    wa_room = requests.post(webex_create_room_url, headers=headers, json=room_body)
-    if wa_room.status_code == 200:
-        room_id = wa_room.json()["id"]
-        print(f"   Room created: {room_name}")
-        print(f"    Room ID: {room_id}")
-        return room_id
-    else:
-        print(f"   *** Room creation failed: {wa_room.status_code}")
-        print(wa_room.json())
+    for _ in range(5):
+        try:
+            # Create a Webex App room for each pair
+            wa_room = requests.post(
+                webex_create_room_url, headers=headers, json=room_body
+            )
+            if wa_room.status_code == 200:
+                room_id = wa_room.json()["id"]
+                print(f"   Room created: {room_name}")
+                print(f"    Room ID: {room_id}")
+                return room_id
+        except Exception as e:
+            print(f"   *** Room creation failed: {wa_room.status_code}")
+            print(f"   *** Sleeping for {pow(2, _)} seconds and trying again.")
+            sleep(pow(2, _))
+            print(e)
 
 
 def add_ses_to_room(SE_emails, wa_room):
@@ -39,15 +47,19 @@ def add_ses_to_room(SE_emails, wa_room):
             "roomId": wa_room,
             "personEmail": email,
         }
-        wa_membership = requests.post(
-            webex_memberships_url, headers=headers, json=membership_body
-        )
-        if wa_membership.status_code == 200:
-            print(f"    SE{x + 1} added to room.")
-            # print(wa_membership.json())
-        else:
-            print(f"    SE{x + 1} ({email}) failed to add to room.")
-            print(wa_membership.json())
+        for _ in range(5):
+            try:
+                wa_membership = requests.post(
+                    webex_memberships_url, headers=headers, json=membership_body
+                )
+                if wa_membership.status_code == 200:
+                    print(f"    SE{x + 1} added to room.")
+                    # print(wa_membership.json())
+            except Exception as e:
+                print(f"    *** SE{x + 1} ({email}) failed to add to room.")
+                print(f"    *** Sleeping for {pow(2, _)} seconds and trying again.")
+                sleep(pow(2, _))
+                print(e)
 
 
 def send_intro_message(wa_room):
@@ -58,31 +70,44 @@ def send_intro_message(wa_room):
         "markdown": p.intro_message_1,
         "attachments": intro_card,
     }
-    wa_intro_message = requests.post(
-        webex_messages_url, headers=headers, json=intro_message_body
-    )
-    if wa_intro_message.status_code == 200:
-        print(f"    Intro message sent ({wa_intro_message.status_code})")
-        print(f"     Message ID: {wa_intro_message.json()['id']}")
-    else:
-        print(f"    *** Intro message failed ({wa_intro_message.status_code})")
-        print(wa_intro_message.json())
+    for _ in range(5):
+        try:
+            wa_intro_message = requests.post(
+                webex_messages_url, headers=headers, json=intro_message_body
+            )
+            if wa_intro_message.status_code == 200:
+                print(f"    Intro message sent ({wa_intro_message.status_code})")
+                print(f"     Message ID: {wa_intro_message.json()['id']}")
+                break
+        except Exception as e:
+            print(f"    *** Intro message failed ({wa_intro_message.status_code})")
+            print(f"    *** Sleeping for {pow(2, _)} seconds and trying again.")
+            sleep(pow(2, _))
+            print(e)
 
 
 def send_follow_up_message(wa_room):
     # Send follow-up message to the room
-    wa_follow_up_message = requests.post(
-        webex_messages_url,
-        headers=headers,
-        json={"roomId": wa_room, "markdown": p.follow_up_message},
-    )
-    if wa_follow_up_message.status_code == 200:
-        print(f"    Follow-up message sent ({wa_follow_up_message.status_code})")
-        print(f"     Message ID: {wa_follow_up_message.json()['id']}")
-        print("   Setup complete.")
-    else:
-        print(f"  *** Follow-up message failed ({wa_follow_up_message.status_code})")
-        print(wa_follow_up_message.json())
+    for _ in range(5):
+        try:
+            wa_follow_up_message = requests.post(
+                webex_messages_url,
+                headers=headers,
+                json={"roomId": wa_room, "markdown": p.follow_up_message},
+            )
+            if wa_follow_up_message.status_code == 200:
+                print(
+                    f"    Follow-up message sent ({wa_follow_up_message.status_code})"
+                )
+                print(f"     Message ID: {wa_follow_up_message.json()['id']}")
+                print("   Setup complete.")
+        except Exception as e:
+            print(
+                f"  *** Follow-up message failed ({wa_follow_up_message.status_code})"
+            )
+            print(f"  *** Sleeping for {pow(2, _)} seconds and trying again.")
+            sleep(pow(2, _))
+            print(e)
 
 
 def get_room_details(room_id):

@@ -7,3 +7,5 @@ utils/preferences.py
 .venv
 .mypy_cache/
 .cache*
+
+async_spaces.py

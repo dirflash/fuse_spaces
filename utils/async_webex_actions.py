@@ -17,14 +17,12 @@ headers = {
 }
 
 
-async def make_space(fuse_date, SE1_name, SE2_name):
-    room_name = (
-        f"Fuse Session ({fuse_date}) - Intro space for {SE1_name} and {SE2_name}"
-    )
+async def make_space(SE1_name, SE2_name):
+    room_name = f"FUSE Session - Intro space for {SE1_name} and {SE2_name}"
     room_body = {
         "title": room_name,
         "isLocked": False,
-        "description": f"Fuse Session - Intro space for {SE1_name} and {SE2_name}",
+        "description": f"FUSE Session - Intro space for {SE1_name} and {SE2_name}",
     }
 
     async with aiohttp.ClientSession() as session:
@@ -151,16 +149,25 @@ async def send_intro_message(wa_room):
                 print(e)
 
 
-async def send_follow_up_message(wa_room):
+async def send_follow_up_message(wa_room, SE_emails):
     too_many_requests_counter = 0
     too_many_requests_limit = 1
+    SE1_email = SE_emails[0]
+    SE2_email = SE_emails[1]
+    final_intro_message = p.follow_up_message.replace(
+        "<@personEmail:SE1_email>",
+        f"<@personEmail:{SE1_email}>",
+    ).replace(
+        "<@personEmail:SE2_email>",
+        f"<@personEmail:{SE2_email}>",
+    )
     async with aiohttp.ClientSession() as session:
         for _ in range(5):
             try:
                 async with session.post(
                     webex_messages_url,
                     headers=headers,
-                    json={"roomId": wa_room, "markdown": p.follow_up_message},
+                    json={"roomId": wa_room, "markdown": final_intro_message},
                 ) as resp:
                     response = await resp.json()
                     if resp.status == 200:

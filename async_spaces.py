@@ -22,7 +22,7 @@ fuse_date = "1/19/2024"
 
 async def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):
     # Create a Webex App room for each pair
-    room_id = await wa.make_space(fuse_date, SE1_name, SE2_name)
+    room_id = await wa.make_space(SE1_name, SE2_name)
     # Add SE1 and SE2 to the room
     await wa.add_ses_to_room(SE_emails, room_id)
     # Add MongoDB document containing room_id and SE_emails
@@ -30,7 +30,7 @@ async def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):
     # Send intro message to the room
     await wa.send_intro_message(room_id)
     # Send follow-up message to the room
-    await wa.send_follow_up_message(room_id)
+    await wa.send_follow_up_message(room_id, SE_emails)
 
 
 async def run_webex_activities(partner_pairs, se_name_dict):

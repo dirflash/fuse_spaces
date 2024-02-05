@@ -25,6 +25,8 @@ async def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):
     room_id = await wa.make_space(fuse_date, SE1_name, SE2_name)
     # Add SE1 and SE2 to the room
     await wa.add_ses_to_room(SE_emails, room_id)
+    # Add MongoDB document containing room_id and SE_emails
+    await wa.add_room_to_db(fuse_date, room_id, SE_emails)
     # Send intro message to the room
     await wa.send_intro_message(room_id)
     # Send follow-up message to the room

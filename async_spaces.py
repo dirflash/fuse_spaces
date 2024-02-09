@@ -15,9 +15,9 @@ from pymongo.errors import ConnectionFailure
 from utils import async_webex_actions as wa
 from utils import preferences as p
 
-TEST_MODE = True
+TEST_MODE = False
 
-fuse_date = "1/19/2024"
+fuse_date = p.fuse_date
 
 
 async def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):

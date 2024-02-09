@@ -15,7 +15,7 @@ from utils import webex_actions as wa
 
 TEST_MODE = True
 
-fuse_date = "1/19/2024"
+fuse_date = "2/9/2024"
 
 
 def webex_activities(fuse_date, SE1_name, SE2_name, SE_emails):
